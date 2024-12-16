@@ -4,15 +4,12 @@ $username = "root";
 $password = "";
 $dbname = "food";
 
-// 創建連接
 $conn = new mysqli($servername, $username, $password, $dbname);
-
-// 檢查連接是否成功
 if ($conn->connect_error) {
     die("連接失敗: " . $conn->connect_error);
 }
 
-// 執行SQL查詢
+
 $sql = "SELECT ingredient FROM food2";
 $result = $conn->query($sql);
 
@@ -33,9 +30,6 @@ if ($result->num_rows > 0) {
 $conn->close();
 
 
-
-
-
 $apiKey="";
 $url = 'https://api.openai.com/v1/chat/completions';
 
@@ -45,7 +39,7 @@ $headers = array(
     "Content-Type: application/json"
 );
 
-// Define messages
+//Define messages
 $messages = array();
 $messages[] = array("role" => "user", "content" => $ingredientString . "，假設冰箱裡只有這些材料，身為一位家庭主婦，這些材料只能做出甚麼料理?
 請回答3道料理，請回覆料理名稱以及簡易的料理步驟，
@@ -55,14 +49,14 @@ $messages[] = array("role" => "user", "content" => $ingredientString . "，假�
 請輪流使用每一樣材料生成料理以提升生成料理的多樣性");
 
 
-// Define data
+//Define data
 $data = array();
 $data["model"] = "gpt-3.5-turbo";
 $data["messages"] = $messages;
 $data["temperature"] = 0.7;
 $data["max_tokens"] = 1200;
 
-// init curl
+//init curl
 $curl = curl_init($url);
 curl_setopt($curl, CURLOPT_POST, 1);
 curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
@@ -78,15 +72,12 @@ if (curl_errno($curl)) {
     $response = json_decode($result, true);
     if (isset($response["choices"][0]["message"]["content"])) {
         $generatedText = $response["choices"][0]["message"]["content"];
-        //echo "<br>生成的文本： " . $generatedText . "<br>";
         echo '<span style="font-size: 40px ; font-family: Arial ; ">' . "<br>生成的食譜：<br> " . nl2br($generatedText) . '</span>';
         //nl2br 用於分行
     } else {
-        echo "無法提取生成的文本。";
+        echo "無法讀取生成的食譜。";
     }
 }
 
 curl_close($curl);
-
-
 ?>
